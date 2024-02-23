@@ -1,28 +1,23 @@
 package Models;
 
-import java.io.*;
+
 import java.sql.*;
-import java.util.LinkedList;
+import java.io.*;
+import java.util.*;
 
-public class SqlConnector {
-    final private String queriesPath = "src/main/java/models/queries.csv";
-    private static SqlConnector connector = null;
+public class DatabaseConnect {
+    private String querypath = "src/main/java/models/queries.csv";
 
+    private static DatabaseConnect con = null;
 
-    public static SqlConnector getConnector() {
-        if (connector == null) {
-            connector = new SqlConnector();
+    public static DatabaseConnect Connect (){
+        if (con==null) {
+        con = new DatabaseConnect();
         }
-        return connector;
+        return con;
     }
-
-    /**
-     * Gets data from the Db, based on the query
-     * @param queryName String
-     * @return LinkedList with data String Arrays
-     */
     public LinkedList<String[]> selectQuery(String queryName) throws NullPointerException{
-        try(BufferedReader br = new BufferedReader(new FileReader(queriesPath))) {
+        try(BufferedReader br = new BufferedReader(new FileReader(querypath))) {
             String query = br.readLine();
             String[] line = null;
             while (query != null){
@@ -37,13 +32,7 @@ public class SqlConnector {
         }
         return null;
     }
-
-    /**
-     * Returns a list of String Arrays with data rows recieved from Db.
-     * Each datapoint has type of String or null if missing.
-     * @param query String
-     */
-    private LinkedList<String[]> select(String query, String db, String ip, String port, String user, String password){
+    public LinkedList<String[]> select(String query, String db, String ip, String port, String user, String password){
         LinkedList<String[]> queryReturn = new LinkedList<String[]>();
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -75,4 +64,3 @@ public class SqlConnector {
         return queryReturn;
     }
 }
-
