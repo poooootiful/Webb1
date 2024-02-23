@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 public class DatabaseConnect {
-    private String querypath = "src/main/java/models/queries.csv";
+    final private String querypath = "src/main/java/models/queries.csv";
 
     private static DatabaseConnect con = null;
 
@@ -15,22 +15,6 @@ public class DatabaseConnect {
         con = new DatabaseConnect();
         }
         return con;
-    }
-    public LinkedList<String[]> selectQuery(String queryName) throws NullPointerException{
-        try(BufferedReader br = new BufferedReader(new FileReader(querypath))) {
-            String query = br.readLine();
-            String[] line = null;
-            while (query != null){
-                line = query.trim().split(",");
-                if(line[0].equals(queryName)){
-                    return select(line[1], line[2], line[3], line[4], line[5], line[6]);
-                }
-                query = br.readLine();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
     }
     public LinkedList<String[]> select(String query, String db, String ip, String port, String user, String password){
         LinkedList<String[]> queryReturn = new LinkedList<String[]>();
@@ -63,4 +47,21 @@ public class DatabaseConnect {
         }
         return queryReturn;
     }
+    public LinkedList<String[]> selectQuery(String queryName) throws NullPointerException{
+        try(BufferedReader br = new BufferedReader(new FileReader(querypath))) {
+            String query = br.readLine();
+            String[] line = null;
+            while (query != null){
+                line = query.split(",");
+                if(line[1].equals(queryName)){
+                    return select(line[2], line[3], line[4], line[5], line[6], line[7]);
+                }
+                query = br.readLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
 }

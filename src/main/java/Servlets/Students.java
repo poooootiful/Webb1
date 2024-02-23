@@ -44,12 +44,7 @@ public class Students extends HttpServlet {
                 "    <th>Hobby</th>\n" +
                 "  </tr>\n");
 
-        LinkedList<String[]> queryReturn = DatabaseConnect.Connect().selectQuery("Getstudents");
-
-        System.out.println(queryReturn);
-
-
-        /*for (int i = 0; i<5; i++) {
+        for (int i = 0; i<5; i++) {
             out.println("  <tr>\n" +
                     "    <td>"+id+"</td>\n" +
                     "    <td>"+Firstname+"</td>\n" +
@@ -58,10 +53,12 @@ public class Students extends HttpServlet {
                     "    <td>"+Hobby+"</td>\n" +
                     "  </tr>\n");
             id++;
-        }*/
+        }
 
         out.println("</table>");
         out.println("</body>");
         out.println("</html>");
     }
+    LinkedList<String[]> query = DatabaseConnect.Connect().selectQuery("Getstudents");
+
 }

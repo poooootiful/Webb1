@@ -1,1 +1,1 @@
-Getstudents, select*form students, gritacademy, localhost, 3306, root, 8462
+Getstudents,SELECT*FROM students,gritacademy,localhost,3306,root,8462
