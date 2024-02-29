@@ -1,25 +1,35 @@
 package Servlets;
 
+import Models.DatabaseConnect;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.servlet.http.HttpServletRequest;
 
 @WebServlet(urlPatterns = "/Courses")
 public class Courses  extends HttpServlet {
 
-    String Name = null;
-    String Yhp = null;
-    String Description = null;
+    //The Sql line used to get info
+    String CoursesSql = "SELECT*FROM courses";
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
-        int id = 1;
 
+        //Connect to database
+        Connection con = DatabaseConnect.getConnection();
+
+        //Make a veriable for printing out html
         PrintWriter out = response.getWriter();
 
+        //Html
         out.println("<html>");
         out.println("<head><title>Courses</title></head>");
         out.println("<body>");
@@ -30,24 +40,36 @@ public class Courses  extends HttpServlet {
                 "        <li style=\"display:inline\"><a href=\"/Courses\">Courses</a></li>\n" +
                 "        <li style=\"display:inline\"><a href=\"/Attendance\">Attendance</a></li>\n" +
                 "    </ul>");
-        out.println("<table>\n" +
+        out.println("<table style = \"border: 1px solid\">\n" +
                 "  <tr>\n" +
-                "    <th>Id</th>\n" +
-                "    <th>Name</th>\n" +
-                "    <th><YHP</th>\n" +
-                "    <th><Description</th>\n" +
+                "    <th style = \"border: 1px solid\">Id</th>\n" +
+                "    <th style = \"border: 1px solid\">Name</th>\n" +
+                "    <th style = \"border: 1px solid\">Yhp</th>\n" +
+                "    <th style = \"border: 1px solid\">Descripstion</th>\n" +
                 "  </tr>\n") ;
 
-        for (int i = 0; i<5; i++) {
-            out.println("  <tr>\n" +
-                    "    <td>"+id+"</td>\n" +
-                    "    <td>"+Name+"</td>\n" +
-                    "    <td>"+Yhp+"</td>\n" +
-                    "    <td>"+Description+"</td>\n" +
-                    "  </tr>\n");
-            id++;
+        //Get info from database and put it in the table
+        try {
+            Statement statement = con.createStatement();
+
+            ResultSet result = statement.executeQuery(CoursesSql);
+
+            while(result.next()) {
+                out.println(("  <tr>\n" +
+                        "    <td style = \"border: 1px solid\">"+result.getInt("id")+"</td>\n" +
+                        "    <td style = \"border: 1px solid\">"+result.getString("Name")+"</td>\n" +
+                        "    <td style = \"border: 1px solid\">"+result.getString("Yhp")+"</td>\n" +
+                        "    <td style = \"border: 1px solid\">"+result.getString("Description")+"</td>\n" +
+                        "  </tr>\n"));
+            }
+            con.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
         }
 
+        //Closing tags for html
         out.println("</table>");
         out.println("</body>");
         out.println("</html>");

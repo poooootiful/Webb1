@@ -1,67 +1,59 @@
 package Models;
+import com.mysql.cj.jdbc.MysqlDataSource;
 
-
-import java.sql.*;
-import java.io.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DatabaseConnect {
-    final private String querypath = "src/main/java/models/queries.csv";
+    //Databaseconfig
+    static String url = "localhost";
+    static int port = 3306;
+    static String database = "gritacademy";
+    static String username = "Read";
+    static String password = "8462";
 
-    private static DatabaseConnect con = null;
+    //Private variables
+    private static DatabaseConnect db;
+    private MysqlDataSource dataSource;
+    private DatabaseConnect () {}
 
-    public static DatabaseConnect Connect (){
-        if (con==null) {
-        con = new DatabaseConnect();
-        }
-        return con;
+    private void initializeDataSource() {
+
+        dataSource = new MysqlDataSource();
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
+        dataSource.setURL("jdbc:mysql://" + url + ":" + port + "/" + database + "?serverTimezone=UTC");
     }
-    public LinkedList<String[]> select(String query, String db, String ip, String port, String user, String password){
-        LinkedList<String[]> queryReturn = new LinkedList<String[]>();
+
+    private Connection createConnection() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://" + ip + ":" + port + "/" + db, user, password);
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            ResultSetMetaData md = rs.getMetaData();
-            int columnCount = md.getColumnCount();
-
-            //add header row to queryReturn
-            String[] headerRow = new String[columnCount];
-            for (int i = 1; i <= columnCount; i++) {
-                headerRow[i-1] = md.getColumnName(i);
-            }
-            queryReturn.add(headerRow);
-
-            //add data row to queryReturn
-            while (rs.next()){
-                String[] dataRow = new String[columnCount];
-                for (int i = 1; i <= columnCount; i++) {
-                    dataRow[i-1] = rs.getString(i);
-                }
-                queryReturn.add(dataRow);
-            }
-            con.close();
-        } catch (Exception e) {
-            System.out.println(e);
+            return dataSource.getConnection();
+        } catch(SQLException ex) {
+            PrintSQLException(ex);
+            return null;
         }
-        return queryReturn;
-    }
-    public LinkedList<String[]> selectQuery(String queryName) throws NullPointerException{
-        try(BufferedReader br = new BufferedReader(new FileReader(querypath))) {
-            String query = br.readLine();
-            String[] line = null;
-            while (query != null){
-                line = query.split(",");
-                if(line[1].equals(queryName)){
-                    return select(line[2], line[3], line[4], line[5], line[6], line[7]);
-                }
-                query = br.readLine();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
     }
 
+    public static Connection getConnection() {
+        if (db == null) {
+            db = new DatabaseConnect();
+            db.initializeDataSource();
+        }
+        return db.createConnection();
+    }
+
+
+    public static void PrintSQLException(SQLException sqle) {
+        PrintSQLException(sqle, false);
+    }
+    public static void PrintSQLException(SQLException sqle, Boolean printStackTrace) {
+        while(sqle != null) {
+            System.out.println("\n---SQLException Caught---\n");
+            System.out.println("SQLState: " + sqle.getSQLState());
+            System.out.println("ErrorCode: " + sqle.getErrorCode());
+            System.out.println("Message: " + sqle.getMessage());
+            if(printStackTrace) sqle.printStackTrace();
+            sqle = sqle.getNextException();
+        }
+    }
 }

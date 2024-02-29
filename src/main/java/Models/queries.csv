@@ -1,1 +1,0 @@
-Getstudents,SELECT*FROM students,gritacademy,localhost,3306,root,8462
